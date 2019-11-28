@@ -2,39 +2,39 @@
 
 _Based on Comcast_
 
-Testing distributed systems under hard failures like network partitions and instance termination is critical, but it's also important we test them under [less catastrophic conditions](http://www.bravenewgeek.com/sometimes-kill-9-isnt-enough/) because this is what they most often experience. Comcast is a tool designed to simulate common network problems like latency, bandwidth restrictions, and dropped/reordered/corrupted packets.
+Testing distributed systems under hard failures like network partitions and instance termination is critical, but it's also important we test them under [less catastrophic conditions](http://www.bravenewgeek.com/sometimes-kill-9-isnt-enough/) because this is what they most often experience. nbn is a tool designed to simulate common network problems like latency, bandwidth restrictions, and dropped/reordered/corrupted packets.
 
-It works by wrapping up some system tools in a portable(ish) way. On BSD-derived systems such as OSX, we use tools like `ipfw` and `pfctl` to inject failure. On Linux, we use `iptables` and `tc`. Comcast is merely a thin wrapper around these controls. Windows support may be possible with `wipfw` or even the native network stack, but this has not yet been implemented in Comcast and may be at a later date.
+It works by wrapping up some system tools in a portable(ish) way. On BSD-derived systems such as OSX, we use tools like `ipfw` and `pfctl` to inject failure. On Linux, we use `iptables` and `tc`. nbn is merely a thin wrapper around these controls. Windows support may be possible with `wipfw` or even the native network stack, but this has not yet been implemented in nbn and may be at a later date.
 
 ## Installation
 
 ```
-$ go get github.com/tylertreat/comcast
+$ go get github.com/ojkelly/nbn
 ```
 
 ## Usage
 
-On Linux, Comcast supports several options: device, latency, target/default bandwidth, packet loss, protocol, and port number.
+On Linux, nbn supports several options: device, latency, target/default bandwidth, packet loss, protocol, and port number.
 
 ```
-$ comcast --device=eth0 --latency=250 --target-bw=1000 --default-bw=1000000 --packet-loss=10% --target-addr=8.8.8.8,10.0.0.0/24 --target-proto=tcp,udp,icmp --target-port=80,22,1000:2000
+$ nbn --device=eth0 --latency=250 --target-bw=1000 --default-bw=1000000 --packet-loss=10% --target-addr=8.8.8.8,10.0.0.0/24 --target-proto=tcp,udp,icmp --target-port=80,22,1000:2000
 ```
 
-On OSX, Comcast will check for `pfctl` support (as of Yosemite), which supports the same options as above. If `pfctl` is not available, it will use `ipfw` instead, which supports device, latency, target bandwidth, and packet-loss options.
+On OSX, nbn will check for `pfctl` support (as of Yosemite), which supports the same options as above. If `pfctl` is not available, it will use `ipfw` instead, which supports device, latency, target bandwidth, and packet-loss options.
 
-On BSD (with `ipfw`), Comcast currently supports only: device, latency, target bandwidth, and packet loss. 
+On BSD (with `ipfw`), nbn currently supports only: device, latency, target bandwidth, and packet loss. 
 
 ```
-$ comcast --device=eth0 --latency=250 --target-bw=1000 --packet-loss=10%
+$ nbn --device=eth0 --latency=250 --target-bw=1000 --packet-loss=10%
 ```
 
 This will add 250ms of latency, limit bandwidth to 1Mbps, and drop 10% of packets to the targetted (on Linux) destination addresses using the specified protocols on the specified port numbers (slow lane). The default bandwidth specified will apply to all egress traffic (fast lane). To turn this off, run the following:
 
 ```
-$ comcast --stop
+$ nbn --stop
 ```
 
-By default, comcast will determine the system commands to execute, log them to stdout, and execute them. The `--dry-run` flag will skip execution.
+By default, nbn will determine the system commands to execute, log them to stdout, and execute them. The `--dry-run` flag will skip execution.
 
 ## I don't trust you, this code sucks, I hate Go, etc.
 
